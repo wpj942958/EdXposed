@@ -10,13 +10,21 @@ public interface Router {
 
     void installBootstrapHooks(boolean isSystem);
 
-    void loadModulesSafely(boolean callInitZygote);
+    void loadModulesSafely(boolean isInZygote, boolean callInitZygote);
 
     void startBootstrapHook(boolean isSystem);
 
     void startSystemServerHook();
 
+    void startWorkAroundHook();
+
+    void onForkStart();
+
+    void onForkFinish();
+
     void onEnterChildProcess();
 
     void injectConfig();
+
+    boolean isForkCompleted();
 }

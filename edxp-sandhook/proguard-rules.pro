@@ -20,7 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--dontoptimize
 -dontobfuscate
 -keep class de.robv.android.xposed.** {*;}
 -keep class android.** { *; }
@@ -33,6 +32,6 @@
 
 -keep class com.swift.sandhook.** {*;}
 
--keepclasseswithmembers class * {
+-keepclasseswithmember class * {
     native <methods>;
 }

@@ -2,9 +2,6 @@ package com.elderdrivers.riru.edxp.deopt;
 
 import java.util.HashMap;
 
-import de.robv.android.xposed.annotation.ApiSensitive;
-import de.robv.android.xposed.annotation.Level;
-
 /**
  * Providing a whitelist of methods which are the callers of the target methods we want to hook.
  * Because the target methods are inlined into the callers, we deoptimize the callers to
@@ -13,7 +10,6 @@ import de.robv.android.xposed.annotation.Level;
  * Only for methods which are included in pre-compiled framework codes.
  * TODO recompile system apps and priv-apps since their original dex files are available
  */
-@ApiSensitive(Level.MIDDLE)
 public class InlinedMethodCallers {
 
     public static final String KEY_BOOT_IMAGE = "boot_image";
@@ -32,10 +28,8 @@ public class InlinedMethodCallers {
     private static final String[][] BOOT_IMAGE = {
             // callers of Application#attach(Context)
             {"android.app.Instrumentation", "newApplication", "(Ljava/lang/ClassLoader;Ljava/lang/String;Landroid/content/Context;)Landroid/app/Application;"},
-            {"android.app.Instrumentation", "newApplication", "(Ljava/lang/ClassLoader;Landroid/content/Context;)Landroid/app/Application;"},
     };
 
-    // TODO deprecate this
     private static final String[][] BOOT_IMAGE_FOR_MIUI_RES = {
             // for MIUI resources hooking
             {"android.content.res.MiuiResources", "init", "(Ljava/lang/String;)V"},

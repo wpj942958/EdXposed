@@ -9,14 +9,14 @@
 namespace edxp {
 
 
-    static jint Heap_waitForGcToComplete(JNI_START) {
+    static jint Heap_waitForGcToComplete(JNI_START, jlong thread) {
         art::gc::collector::GcType gcType = art::gc::Heap::Current()->WaitForGcToComplete(
-                art::gc::GcCause::kGcCauseNone, art::Thread::Current().Get());
+                art::gc::GcCause::kGcCauseNone, reinterpret_cast<void *>(thread));
         return gcType;
     }
 
     static JNINativeMethod gMethods[] = {
-            NATIVE_METHOD(Heap, waitForGcToComplete, "()I")
+            NATIVE_METHOD(Heap, waitForGcToComplete, "(J)I")
     };
 
     void RegisterArtHeap(JNIEnv *env) {

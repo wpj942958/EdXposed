@@ -1,11 +1,14 @@
 #ifndef _LOGGING_H
 #define _LOGGING_H
 
-#include <android/log.h>
+#include <errno.h>
+#include "android/log.h"
 
 #ifndef LOG_TAG
 #define LOG_TAG    "EdXposed"
 #endif
+
+#include "config.h"
 
 #ifdef LOG_DISABLED
 #define LOGD(...)
@@ -14,7 +17,7 @@
 #define LOGW(...)
 #define LOGE(...)
 #else
-#ifndef NDEBUG
+#ifdef DEBUG
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #else
 #define LOGD(...)

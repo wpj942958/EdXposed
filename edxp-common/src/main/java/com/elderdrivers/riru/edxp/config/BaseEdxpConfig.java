@@ -5,8 +5,8 @@ import android.text.TextUtils;
 public class BaseEdxpConfig implements EdxpConfig {
 
     @Override
-    public String getConfigPath(String suffix) {
-        return ConfigManager.getConfigPath(suffix != null ? suffix : "");
+    public String getInstallerConfigPath(String suffix) {
+        return ConfigManager.getInstallerConfigPath(suffix != null ? suffix : "");
     }
 
     @Override
@@ -20,18 +20,26 @@ public class BaseEdxpConfig implements EdxpConfig {
     }
 
     @Override
+    public String getXposedPropPath() {
+        return ConfigManager.getXposedPropPath();
+    }
+    @Override
     public String getLibSandHookName() {
         return ConfigManager.getLibSandHookName();
+    }
+    @Override
+    public String getLibWhaleName() {
+        return ConfigManager.getLibWhaleName();
+    }
+
+    @Override
+    public boolean isDynamicModulesMode() {
+        return ConfigManager.isDynamicModulesEnabled();
     }
 
     @Override
     public boolean isResourcesHookEnabled() {
         return ConfigManager.isResourcesHookEnabled();
-    }
-
-    @Override
-    public boolean isSELinuxEnforced() {
-        return ConfigManager.isSELinuxEnforced();
     }
 
     @Override
@@ -43,7 +51,4 @@ public class BaseEdxpConfig implements EdxpConfig {
     public boolean isBlackWhiteListMode() {
         return ConfigManager.isBlackWhiteListEnabled();
     }
-
-    @Override
-    public String getModulesList() { return ConfigManager.getModulesList(); }
 }

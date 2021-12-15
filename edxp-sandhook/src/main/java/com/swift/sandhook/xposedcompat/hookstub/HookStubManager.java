@@ -2,7 +2,6 @@ package com.swift.sandhook.xposedcompat.hookstub;
 
 import android.util.Log;
 
-import com.elderdrivers.riru.edxp.sandhook.BuildConfig;
 import com.swift.sandhook.SandHook;
 import com.swift.sandhook.SandHookMethodResolver;
 import com.swift.sandhook.utils.ParamWrapper;
@@ -282,7 +281,6 @@ public class HookStubManager {
                 ((XC_MethodHook) snapshot[beforeIdx]).callBeforeHookedMethod(param);
             } catch (Throwable t) {
                 // reset result (ignoring what the unexpectedly exiting callback did)
-                if( BuildConfig.DEBUG ) XposedBridge.log(t);
                 param.setResult(null);
                 param.returnEarly = false;
                 continue;
@@ -306,7 +304,6 @@ public class HookStubManager {
                     param.setResult(SandHook.callOriginMethod(originMethod, entity.backup, thiz, param.args));
                 }
             } catch (Throwable e) {
-                if( BuildConfig.DEBUG ) XposedBridge.log(e);
                 param.setThrowable(e);
             }
         }
@@ -320,7 +317,6 @@ public class HookStubManager {
             try {
                 ((XC_MethodHook) snapshot[afterIdx]).callAfterHookedMethod(param);
             } catch (Throwable t) {
-                if( BuildConfig.DEBUG ) XposedBridge.log(t);
                 if (lastThrowable == null)
                     param.setResult(lastResult);
                 else
@@ -360,7 +356,7 @@ public class HookStubManager {
             try {
                 ((XC_MethodHook) snapshot[beforeIdx]).callBeforeHookedMethod(param);
             } catch (Throwable t) {
-                if( BuildConfig.DEBUG ) XposedBridge.log(t);
+                XposedBridge.log(t);
                 // reset result (ignoring what the unexpectedly exiting callback did)
                 param.setResult(null);
                 param.returnEarly = false;
@@ -379,7 +375,6 @@ public class HookStubManager {
             try {
                 param.setResult(SandHook.callOriginMethod(true, origin, backup, thiz, param.args));
             } catch (Throwable e) {
-                if( BuildConfig.DEBUG ) XposedBridge.log(e);
                 param.setThrowable(e);
             }
         }
@@ -393,7 +388,7 @@ public class HookStubManager {
             try {
                 ((XC_MethodHook) snapshot[afterIdx]).callAfterHookedMethod(param);
             } catch (Throwable t) {
-                if( BuildConfig.DEBUG ) XposedBridge.log(t);
+                XposedBridge.log(t);
                 if (lastThrowable == null)
                     param.setResult(lastResult);
                 else

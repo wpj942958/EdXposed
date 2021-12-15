@@ -1,33 +1,60 @@
-apply plugin: 'com.android.application'
+import org.gradle.internal.os.OperatingSystem
+apply plugin: 'java-library'
 
-repositories {
-    jcenter()
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-android {
-    compileSdkVersion androidCompileSdkVersion.toInteger()
-    ndkVersion androidCompileNdkVersion
-}
+sourceCompatibility = "7"
+targetCompatibility = "7"
 
-afterEvaluate {
-    android.applicationVariants.all { variant ->
-        def variantNameCapped = variant.name.capitalize()
-        def variantNameLowered = variant.name.toLowerCase()
-
-        task("copyDex${variantNameCapped}", type: Copy) {
-            dependsOn "assemble${variantNameCapped}"
-            def dexOutPath = "${buildDir}/intermediates/dex/${variantNameLowered}/mergeDex${variantNameCapped}"
-            from (dexOutPath){
-                rename("classes.dex", "eddalvikdx.dex")
+task findDx {
+    println "开始执行:findDx"
+    if (OperatingSystem.current().isWindows()){
+        return true
+    }
+    doLast {
+        new ByteArrayOutputStream().withStream { os ->
+            println "开始执行:dalvikdx findDx doLast exec"
+            exec {
+//                commandLine "which", "java"
+                commandLine "which", "dx"
+                standardOutput os
             }
-            destinationDir file(templateRootPath + "system/framework/")
-            outputs.upToDateWhen { false }
+            println "path======"+os.toString()
+            rootProject.ext.dxPath = os.toString()
+//            rootProject.ext.dxPath ="external.com.android.dx.command.Main"
+//            rootProject.ext.dxPath ="/Users/wangpengjian/workin/besunyen/besheng-android/edxposed-0.4.6.4/dalvikdx/build/classes/java/main/external/com/android/dx/command/Main.class"
+//            rootProject.ext.dxPath = os.toString()
         }
-        task("makeJar${variantNameCapped}", type: Jar, dependsOn: "assemble${variantNameCapped}") {
-            dependsOn "assemble${variantNameCapped}"
-            from "${buildDir}/intermediates/javac/${variantNameLowered}/classes"
-            baseName "dalvikdx"
-            outputs.file(archivePath)
+    }
+}
+
+task dexInJar(type: Jar) {
+    println "开始执行:dexInJar"
+    dependsOn jar
+    dependsOn findDx
+    doFirst {
+        println "开始执行:dalvikdx dexInJar doLast exec"
+        println "jar目录="+jar.destinationDir
+        exec {
+            workingDir jar.destinationDir
+            if (OperatingSystem.current().isWindows()){
+                executable "dx.bat"
+                args "--dex", "--output", "classes.dex", "${jar.archiveName}"
+            } else {
+//                executable "bash java -cp dalvikdx.jar"
+//                args rootProject.ext.dxPath.trim(), "--dex", "--output", "classes.dex", "${jar.archiveName}"
+//                commandLine "java -cp dalvikdx.jar"
+                executable "bash"
+                args rootProject.ext.dxPath.trim(), "--dex", "--output", "classes.dex", "${jar.archiveName}"
+            }
         }
+    }
+    from "${jar.destinationDir}/classes.dex"
+    destinationDir jar.destinationDir
+    baseName "eddalvikdx"
+    onlyIf {
+        !jar.state.upToDate || !file(archiveName).exists()
     }
 }

@@ -20,7 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--dontoptimize
 -dontobfuscate
 -keep class de.robv.android.xposed.** {*;}
 -keep class android.** { *; }
@@ -31,6 +30,6 @@
 -keep class * implements com.elderdrivers.riru.common.KeepAll { *; }
 -keepclassmembers class * implements com.elderdrivers.riru.common.KeepMembers { *; }
 
--keepclasseswithmembers class * {
+-keepclasseswithmember class * {
     native <methods>;
 }

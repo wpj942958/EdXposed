@@ -1,6 +1,7 @@
 package com.swift.sandhook.xposedcompat.methodgen;
 
-import com.elderdrivers.riru.edxp.config.ConfigManager;
+import android.text.TextUtils;
+
 import com.swift.sandhook.SandHook;
 import com.swift.sandhook.SandHookMethodResolver;
 import com.swift.sandhook.wrapper.HookWrapper;
@@ -8,6 +9,7 @@ import com.swift.sandhook.xposedcompat.XposedCompat;
 import com.swift.sandhook.xposedcompat.utils.DexLog;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -31,10 +33,8 @@ import external.com.android.dx.TypeId;
 import static com.swift.sandhook.xposedcompat.utils.DexMakerUtils.MD5;
 import static com.swift.sandhook.xposedcompat.utils.DexMakerUtils.autoBoxIfNecessary;
 import static com.swift.sandhook.xposedcompat.utils.DexMakerUtils.autoUnboxIfNecessary;
-import static com.swift.sandhook.xposedcompat.utils.DexMakerUtils.canCache;
 import static com.swift.sandhook.xposedcompat.utils.DexMakerUtils.createResultLocals;
 import static com.swift.sandhook.xposedcompat.utils.DexMakerUtils.getObjTypeIdIfPrimitive;
-import static com.swift.sandhook.xposedcompat.utils.DexMakerUtils.getSha1Hex;
 
 public class HookerDexMaker implements HookMaker {
 
@@ -110,6 +110,7 @@ public class HookerDexMaker implements HookMaker {
     private Method mHookMethod;
     private Method mBackupMethod;
     private Method mCallBackupMethod;
+    private String mDexDirPath;
 
     private static TypeId<?>[] getParameterTypeIds(Class<?>[] parameterTypes, boolean isStatic) {
         int parameterSize = parameterTypes.length;
@@ -140,7 +141,7 @@ public class HookerDexMaker implements HookMaker {
     }
 
     public void start(Member member, XposedBridge.AdditionalHookInfo hookInfo,
-                      ClassLoader appClassLoader) throws Exception {
+                      ClassLoader appClassLoader, String dexDirPath) throws Exception {
         if (member instanceof Method) {
             Method method = (Method) member;
             mIsStatic = Modifier.isStatic(method.getModifiers());
@@ -173,6 +174,7 @@ public class HookerDexMaker implements HookMaker {
         }
         mMember = member;
         mHookInfo = hookInfo;
+        mDexDirPath = dexDirPath;
         if (appClassLoader == null
                 || appClassLoader.getClass().getName().equals("java.lang.BootClassLoader")) {
             mAppClassLoader = this.getClass().getClassLoader();
@@ -188,7 +190,7 @@ public class HookerDexMaker implements HookMaker {
         HookWrapper.HookEntity hookEntity = null;
         //try load cache first
         try {
-            ClassLoader loader = mDexMaker.loadClassDirect(mAppClassLoader, new File(ConfigManager.getCachePath("")), dexName);
+            ClassLoader loader = mDexMaker.loadClassDirect(mAppClassLoader, new File(mDexDirPath), dexName);
             if (loader != null) {
                 hookEntity = loadHookerClass(loader, className);
             }
@@ -215,12 +217,13 @@ public class HookerDexMaker implements HookMaker {
         generateHookMethod();
 
         ClassLoader loader;
-        if (canCache) {
-            loader = mDexMaker.generateAndLoad(mAppClassLoader, new File(ConfigManager.getCachePath("")), dexName, true);
-            File dexFile = new File(ConfigManager.getCachePath(dexName));
-            dexFile.setWritable(true, false);
-            dexFile.setReadable(true, false);
-        } else {
+        if (TextUtils.isEmpty(mDexDirPath)) {
+            throw new IllegalArgumentException("dexDirPath should not be empty!!!");
+        }
+        // Create the dex file and load it.
+        try {
+            loader = mDexMaker.generateAndLoad(mAppClassLoader, new File(mDexDirPath), dexName, true);
+        } catch (IOException e) {
             //can not write file
             byte[] dexBytes = mDexMaker.generate();
             loader = new InMemoryDexClassLoader(ByteBuffer.wrap(dexBytes), mAppClassLoader);
@@ -242,7 +245,7 @@ public class HookerDexMaker implements HookMaker {
     }
 
     private String getClassName(Member originMethod) {
-        return CLASS_NAME_PREFIX + "_" + getSha1Hex(originMethod.toString());
+        return CLASS_NAME_PREFIX + "_" + MD5(originMethod.toString());
     }
 
     public Method getHookMethod() {

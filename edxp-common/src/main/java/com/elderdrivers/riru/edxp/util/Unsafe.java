@@ -21,10 +21,6 @@ import android.util.Log;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import de.robv.android.xposed.annotation.ApiSensitive;
-import de.robv.android.xposed.annotation.Level;
-
-@ApiSensitive(Level.LOW)
 public final class Unsafe {
     private static final String TAG = "Unsafe";
 

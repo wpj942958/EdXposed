@@ -69,10 +69,6 @@ unsigned char trampoline[] = {
 #endif
 static unsigned int trampolineSize = roundUpToPtrSize(sizeof(trampoline));
 
-static inline void FlushCache(void *addr, size_t size) {
-    __builtin___clear_cache((char *) addr, (char *) ((uintptr_t) addr + size));
-}
-
 void *genTrampoline(void *hookMethod) {
     void *targetAddr;
 
@@ -96,7 +92,6 @@ void *genTrampoline(void *hookMethod) {
 #else
 #error Unsupported architecture
 #endif
-    FlushCache(targetAddr, sizeof(trampoline));
 
     return targetAddr;
 }

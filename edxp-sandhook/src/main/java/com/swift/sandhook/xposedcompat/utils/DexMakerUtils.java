@@ -1,11 +1,6 @@
 package com.swift.sandhook.xposedcompat.utils;
-import com.elderdrivers.riru.edxp.config.ConfigManager;
-import com.elderdrivers.riru.edxp.util.Utils;
-
-import java.io.File;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -17,15 +12,6 @@ import external.com.android.dx.TypeId;
 
 public class DexMakerUtils {
 
-    public static boolean canCache = true;
-
-    static {
-        File cacheDir = new File(ConfigManager.getCachePath(""));
-        if(!cacheDir.canRead() || !cacheDir.canWrite()) {
-            Utils.logW("Cache disabled");
-            canCache = false;
-        }
-    }
 
     private static volatile Method addInstMethod, specMethod;
 
@@ -234,21 +220,5 @@ public class DexMakerUtils {
             e.printStackTrace();
         }
         return source;
-    }
-
-    public static String getSha1Hex(String text) {
-        final MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-1");
-            byte[] result = digest.digest(text.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : result) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            DexLog.e("error hashing target method: " + text, e);
-        }
-        return "";
     }
 }

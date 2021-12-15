@@ -1,15 +1,22 @@
+import com.android.builder.core.BuilderConstants
+
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion androidCompileSdkVersion.toInteger()
-    ndkVersion androidCompileNdkVersion
+    compileSdkVersion 28
 }
 
 task makeStubJar(type: Jar){
-    dependsOn assemble
     baseName 'framework-stub'
-    from("${buildDir}/intermediates/javac/release/classes/")
+    from("${projectDir}/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/")
+    into('')
+    destinationDir file("${projectDir}/libs")
     exclude('BuildConfig.class', 'R.class')
     exclude{ it.name.startsWith('R$')}
-    outputs.file(archivePath)
+}
+
+afterEvaluate {
+    tasks.withType(JavaCompile) {
+        it.finalizedBy(makeStubJar)
+    }
 }

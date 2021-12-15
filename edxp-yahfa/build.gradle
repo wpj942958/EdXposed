@@ -4,12 +4,12 @@ sourceCompatibility = "7"
 targetCompatibility = "7"
 
 android {
-    compileSdkVersion androidCompileSdkVersion.toInteger()
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.elderdrivers.riru.edxp.yahfa"
-        minSdkVersion androidMinSdkVersion.toInteger()
-        targetSdkVersion androidTargetSdkVersion.toInteger()
+        minSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         multiDexEnabled false
@@ -22,13 +22,13 @@ android {
         }
     }
 
-    ndkVersion androidCompileNdkVersion
 }
 
 dependencies {
-    compileOnly project(':hiddenapi-stubs')
+    compileOnly files("${hiddenApiStubJarFilePath}")
     implementation project(':edxp-common')
-    compileOnly files(project(":dexmaker").tasks.getByName("makeJarRelease").outputs)
+    implementation project(':xposed-bridge')
+    compileOnly project(':dexmaker')
 }
 
 
@@ -57,18 +57,23 @@ afterEvaluate {
         def variantNameCapped = variant.name.capitalize()
         def variantNameLowered = variant.name.toLowerCase()
 
-        task("copyDex${variantNameCapped}", type: Copy) {
-            dependsOn "assemble${variantNameCapped}"
+        def myTemplatePath = "${projectDir}/template_override/"
+
+        task("makeAndCopy${variantNameCapped}", type: Jar, dependsOn: "assemble${variantNameCapped}") {
             dependsOn tasks.getByPath(":edxp-common:copyCommonProperties")
             def dexOutPath = variant.name.contains("release") ?
-                    "${buildDir}/intermediates/dex/${variantNameLowered}/minify${variantNameCapped}WithR8" :
-                    "${buildDir}/intermediates/dex/${variantNameLowered}/mergeDex${variantNameCapped}"
-            from (dexOutPath){
-                rename("classes.dex", "yahfa.dex")
+                    "${buildDir}/intermediates/transforms/dexMerger/${variantNameLowered}/0/" :
+                    "${buildDir}/intermediates/dex/${variantNameLowered}/mergeDex${variantNameCapped}/out/"
+            from dexOutPath, "${projectDir}/src/main/resources/"
+            destinationDir file(myTemplatePath + "system/framework/")
+            baseName "edxp"
+            doLast {
+                copy {
+                    from file(myTemplatePath)
+                    into file(templateRootPath)
+                }
             }
-            destinationDir file(zipPathMagiskReleasePath + "system/framework/")
             outputs.upToDateWhen { false }
         }
-
     }
 }

@@ -1,11 +1,11 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion androidCompileSdkVersion.toInteger()
+    compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion androidMinSdkVersion.toInteger()
-        targetSdkVersion androidTargetSdkVersion.toInteger()
+        minSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -14,23 +14,16 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "VERSION_NAME", "\"${rootProject.ext.versionName}\"")
-            buildConfigField("Integer", "VERSION_CODE", String.valueOf(rootProject.ext.versionCode))
-        }
-        debug {
-            buildConfigField("String", "VERSION_NAME", "\"${rootProject.ext.versionName}\"")
-            buildConfigField("Integer", "VERSION_CODE", String.valueOf(rootProject.ext.versionCode))
         }
     }
 
-    ndkVersion androidCompileNdkVersion
 }
 
 dependencies {
     compileOnly project(':hiddenapi-stubs')
-    api project(':xposed-bridge')
+    implementation project(':xposed-bridge')
     compileOnly project(':dexmaker')
-    compileOnly 'com.android.support:support-annotations:28.0.0'
+    api "androidx.annotation:annotation:1.1.0-rc01"
 }
 
 

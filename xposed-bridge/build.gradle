@@ -1,11 +1,11 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion androidCompileSdkVersion.toInteger()
-    ndkVersion androidCompileNdkVersion
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
-        minSdkVersion androidMinSdkVersion.toInteger()
+        minSdkVersion 26
     }
 
     sourceSets {
@@ -18,12 +18,6 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "int", "API_CODE", "$apiCode"
-            buildConfigField "boolean", "DEBUG", "false"
-        }
-        debug {
-            buildConfigField "int", "API_CODE", "$apiCode"
-            buildConfigField "boolean", "DEBUG", "true"
         }
     }
 }
@@ -45,8 +39,8 @@ preBuild.doLast {
 }
 
 dependencies {
-    compileOnly files(project(":dexmaker").tasks.getByName("makeJarRelease").outputs)
-    compileOnly files(project(":hiddenapi-stubs").tasks.getByName("makeStubJar").outputs)
+    compileOnly project(':hiddenapi-stubs')
+    compileOnly project(':dexmaker')
 }
 
 afterEvaluate {

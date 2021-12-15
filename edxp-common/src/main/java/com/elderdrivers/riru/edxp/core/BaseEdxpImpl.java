@@ -1,12 +1,14 @@
 package com.elderdrivers.riru.edxp.core;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
+import com.elderdrivers.riru.edxp.proxy.BlackWhiteListProxy;
 import com.elderdrivers.riru.edxp.proxy.NormalProxy;
 import com.elderdrivers.riru.edxp.proxy.Router;
 
 public abstract class BaseEdxpImpl implements EdxpImpl {
 
+    protected Proxy mBlackWhiteListProxy;
     protected Proxy mNormalProxy;
     protected Router mRouter;
 
@@ -19,6 +21,15 @@ public abstract class BaseEdxpImpl implements EdxpImpl {
     @Override
     public boolean isInitialized() {
         return mInitialized;
+    }
+
+    @NonNull
+    @Override
+    public Proxy getBlackWhiteListProxy() {
+        if (mBlackWhiteListProxy == null) {
+            mBlackWhiteListProxy = createBlackWhiteListProxy();
+        }
+        return mBlackWhiteListProxy;
     }
 
     @NonNull
@@ -37,6 +48,10 @@ public abstract class BaseEdxpImpl implements EdxpImpl {
             mRouter = createRouter();
         }
         return mRouter;
+    }
+
+    protected Proxy createBlackWhiteListProxy() {
+        return new BlackWhiteListProxy(getRouter());
     }
 
     protected Proxy createNormalProxy() {

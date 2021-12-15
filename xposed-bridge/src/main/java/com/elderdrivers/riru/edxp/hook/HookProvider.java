@@ -26,6 +26,8 @@ public interface HookProvider {
 
     boolean removeFinalFlagNative(Class clazz);
 
+    void setNativeFlag(Member hookMethod, boolean isNative);
+
     boolean methodHooked(Member target);
 
 }

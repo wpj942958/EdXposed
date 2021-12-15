@@ -17,9 +17,15 @@ jboolean Java_lab_galaxy_yahfa_HookMain_backupAndHookNative(JNIEnv *env, jclass 
                                                             jobject target, jobject hook,
                                                             jobject backup);
 
+void Java_lab_galaxy_yahfa_HookMain_ensureMethodCached(JNIEnv *env, jclass clazz,
+                                                       jobject hook,
+                                                       jobject backup);
+
 void setNonCompilable(void *method);
 
-void *getArtMethod(JNIEnv *env, jobject jmethod);
+bool setNativeFlag(void *method, bool isNative);
+
+static void *getResolvedMethodsAddr(JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }

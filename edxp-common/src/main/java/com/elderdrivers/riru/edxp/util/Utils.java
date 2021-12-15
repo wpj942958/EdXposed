@@ -5,8 +5,6 @@ import android.util.Log;
 import com.elderdrivers.riru.edxp.common.BuildConfig;
 
 import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.annotation.ApiSensitive;
-import de.robv.android.xposed.annotation.Level;
 
 
 public class Utils {
@@ -47,7 +45,6 @@ public class Utils {
         Log.e(LOG_TAG, msg, throwable);
     }
 
-    @ApiSensitive(Level.LOW)
     public static String getSysProp(String key) {
         try {
             Class sysProps = XposedHelpers.findClassIfExists("android.os.SystemProperties", null);
